@@ -9,7 +9,7 @@ edition = "2021"
 [dependencies]
 dioxus = { version = "0.7.1", features = ["router", "fullstack"] }
 
-wasm-bindgen = "=0.2.114"
+wasm-bindgen = "=0.2.108"
 
 [features]
 default = ["web"]

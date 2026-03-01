@@ -10,18 +10,36 @@
       let
         pkgs = import nixpkgs { inherit system; };
         naersk-lib = pkgs.callPackage naersk { };
-      in
-      {
-        defaultPackage = naersk-lib.buildPackage ./.;
-        devShell = with pkgs; mkShell {
-          buildInputs = [
+        nativeBuildInputs = with pkgs; [
             cargo
             rustc
             rustfmt
             pre-commit
             rustPackages.clippy
             dioxus-cli
+            lld
           ];
+      in
+      {
+        defaultPackage = naersk-lib.buildPackage {
+          src = ./.;
+          nativeBuildInputs = nativeBuildInputs;
+          buildInputs = with pkgs; [
+          	openssl
+          ];
+          # Skip naersk's default cargo build — use dx instead
+          singleStep = true;
+          buildPhase = ''
+        	dx build --release --platform server
+          '';
+          installPhase = ''
+        	mkdir -p $out/bin
+        	cp -r dist/. $out/bin/
+          '';
+        };
+
+        devShell = with pkgs; mkShell {
+          buildInputs = nativeBuildInputs;
           RUST_SRC_PATH = rustPlatform.rustLibSrc;
         };
       }
