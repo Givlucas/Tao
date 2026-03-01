@@ -30,6 +30,7 @@
           # Skip naersk's default cargo build — use dx instead
           singleStep = true;
           doCheck = false;
+          checkPhase = "";
           buildPhase = ''
         	dx build --release --platform server
           '';
