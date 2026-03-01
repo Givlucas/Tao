@@ -29,12 +29,13 @@
           ];
           # Skip naersk's default cargo build — use dx instead
           singleStep = true;
+          doCheck = false;
           buildPhase = ''
         	dx build --release --platform server
           '';
           installPhase = ''
         	mkdir -p $out/bin
-        	cp -r dist/. $out/bin/
+        	cp -r ./target/dx/tao/release/web/. $out/bin/
           '';
         };
 
