@@ -1,28 +1,24 @@
 {
   inputs = {
-    naersk.url = "github:nix-community/naersk/master";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
     utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, utils, naersk }:
+  outputs = { self, nixpkgs, utils }:
     utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs { inherit system; };
-        naersk-lib = pkgs.callPackage naersk { };
         nativeBuildInputs = with pkgs; [
-            cargo
-            rustc
-            rustfmt
-            pre-commit
-            rustPackages.clippy
             dioxus-cli
             lld
           ];
       in
       {
-        defaultPackage = naersk-lib.buildPackage {
+        defaultPackage = pkgs.rustPlatform.buildRustPackage {
+          pname = "tao";
+          name = "tao";
           src = ./.;
+          cargoLock.lockFile = ./Cargo.lock;
           nativeBuildInputs = nativeBuildInputs;
           buildInputs = with pkgs; [
           	openssl
@@ -37,7 +33,7 @@
         };
 
         devShell = with pkgs; mkShell {
-          buildInputs = nativeBuildInputs;
+          buildInputs = nativeBuildInputs ++ [ cargo ];
           RUST_SRC_PATH = rustPlatform.rustLibSrc;
         };
       }
